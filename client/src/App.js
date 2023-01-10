@@ -1,23 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+import LoginForm from "./components/LoginForm";
+import { useEffect } from "react";
+import { useSelector , useDispatch} from "react-redux";
+import { checkAuth, logout } from "./store/authSlice";
+
 
 function App() {
+  const dispatch = useDispatch();
+  const data = useSelector(store => store.auth)
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      dispatch(checkAuth());
+    }
+  }, [])
+  if (data.isLoading) {
+    return (
+      <div>Завантаження...</div>
+    ) 
+  }
+
+  if (!data.isAuth) {
+    return (
+      <LoginForm/>
+    )
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <h1>{data.isAuth ? `Користувач авторизований: ${data.user.email}` : 'АВТОРИЗУЙТЕСЬ'}</h1>
+        <button onClick={() => dispatch(logout())}>Вийти</button>
     </div>
   );
 }
